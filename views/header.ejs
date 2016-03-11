@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Blog</title>
+<link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<header>
+<h1><%= title%></h1>
+</header>
+<nav>
+<span><a title="首页" href="/">Home</a></span>
+<% if(user) {%>
+<span><a title="post an article" href="/post">post</a></span>
+<span><a title="log out" href="/logout">Logout</a></span>
+<% } else { %>
+<span><a title="Log in this blog" href="/login">Login</a></span>
+<span><a title="Register this blog" href="/reg">Register</a></span>
+<% } %>
+</nav>
+<article>
+
+<% if(success) { %>
+<div><%= success %></div>
+<% } %>
+<% if(error) {%>
+<div><%= error %></div>
+<% } %>

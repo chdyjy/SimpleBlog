@@ -1,0 +1,17 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "connect-flash": "*",
+    "connect-mongo": "*",
+    "ejs": "*",
+    "express": "3.21.2",
+    "method-override": "^2.3.5",
+    "mongodb": "*"
+  }
+}
