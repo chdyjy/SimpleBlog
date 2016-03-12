@@ -12,6 +12,7 @@
     "ejs": "*",
     "express": "3.21.2",
     "method-override": "^2.3.5",
-    "mongodb": "*"
+    "mongodb": "*",
+    "markdown": "*"
   }
 }

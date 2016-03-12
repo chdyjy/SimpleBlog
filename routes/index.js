@@ -3,22 +3,29 @@
  * simple blog with express & mongoDB
  */
 var crypto = require('crypto'),
-	User = require('../models/user.js');
+	User = require('../models/user.js'),
+	Post = require('../models/post.js');
 
 module.exports = function (app){
 	app.get('/',function(req,res){
-		res.render('index',{
-			title:'主页',
+		Post.get(null,function(err,posts){
+			if(err){
+				posts = [];
+			}
+			res.render('index',{
+			title:'Index',
 			user: req.session.user,
+			posts: posts,
 			success: req.flash('success').toString(),
 			error: req.flash('error').toString()
+			});
 		});
 	});
 
 	app.get('/reg',checkNotLogin);
 	app.get('/reg',function(req,res){
 		res.render('reg',{
-			title:'注册',
+			title:'register',
 			user: req.session.user,
 			success: req.flash('success').toString(),
 			error: req.flash('error').toString()
@@ -65,7 +72,7 @@ module.exports = function (app){
 	app.get('/login',checkNotLogin);
 	app.get('/login',function(req,res){
 		res.render('login',{
-			title:'登录',
+			title:'Login',
 			user: req.session.user,
 			success: req.flash('success').toString(),
 			error: req.flash('error').toString()
@@ -94,11 +101,26 @@ module.exports = function (app){
 
 	app.get('/post',checkLogin);
 	app.get('/post',function(req,res){
-		res.render('post',{title:'发布'});
+		res.render('post',{
+			title:'Post',
+			user: req.session.user,
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
 	});
 
 	app.post('/post',checkLogin);
 	app.post('/post',function(req,res){
+		var currentUser = req.session.user,
+			post = new Post(currentUser.name,req.body.title,req.body.post);
+		post.save(function(err){
+			if(err){
+				req.flash('error',err);
+				return res.redirect('/');
+			}
+			req.flash('success','success post.');
+			res.redirect('/');
+		});
 	});
 
 	app.get('/login',checkLogin);
@@ -111,14 +133,14 @@ module.exports = function (app){
 	//权限检查并控制
 	function checkLogin(req, res, next){
 		if(!req.session.user){
-			req.flash('error','Not logged in')；
+			req.flash('error','Not logged in');
 			res.redirect('/login');
 		}
 		next();
 	}
 	function checkNotLogin(req, res, next){
 		if(req.session.user){
-			req.flash('error','Already logged in')；
+			req.flash('error','Already logged in');
 			res.redirect('back');
 		}
 		next();

@@ -1,3 +1,9 @@
 <%- include header %>
-博客首页
+<% posts.forEach(function(post,index){ %>
+<p><h2><a href="#"><%= post.title %></a></h2></p>
+<p class="info">
+	Author: <a href="#"><%= post.name %></a> | Date: <%=post.time.minute %>
+</p>
+<p><%- post.post %></p>
+<%	}) %>
 <%- include footer %>
