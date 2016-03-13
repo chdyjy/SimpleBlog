@@ -1,0 +1,22 @@
+<br/>
+Comments
+<hr/>
+<% post.comments.forEach(function (comment, index){ %>
+<p>
+	<a href="<%= comment.website %>"><%= comment.name %></a> 
+	<span class="info"> Replied in [<%= comment.time %>]</span>
+</p>
+<p><%- comment.content %></p>
+<% }) %>
+
+
+<% if(user) { %>
+	<form method="post">
+	User:<%= user.name %> (<%= user.email %>)<br/>
+	<textarea name="content" rows="5" cols="80"></textarea><br/>
+	<input type="submit" value="Send" />
+	</fom>
+<% }else{ %>
+	Hi,you can send a comment after log in.
+<% } %>
+</form>

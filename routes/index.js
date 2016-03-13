@@ -3,21 +3,22 @@
  * simple blog with express & mongoDB
  */
 var crypto = require('crypto'),
+	Post = require('../models/post.js'),
 	User = require('../models/user.js'),
-	Post = require('../models/post.js');
+	Comment = require('../models/comment.js');
 
 module.exports = function (app){
 	app.get('/',function(req,res){
-		Post.get(null,function(err,posts){
+		Post.getAll(null,function(err,posts){
 			if(err){
 				posts = [];
 			}
 			res.render('index',{
-			title:'Index',
-			user: req.session.user,
-			posts: posts,
-			success: req.flash('success').toString(),
-			error: req.flash('error').toString()
+				title:'Index',
+				user: req.session.user,
+				posts: posts,
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
 			});
 		});
 	});
@@ -128,6 +129,110 @@ module.exports = function (app){
 		req.session.user = null;
 		req.flash('success','Logout success.');
 		res.redirect('/');
+	});
+
+	app.get('/u/:name',function(req,res){
+		User.get(req.params.name,function(err,user){
+			if(!user){
+				req.flash('error','user not exists.');
+				return res.redirect('/');
+			}
+			Post.getAll(user.name,function(err,posts){
+				res.render('user',{
+				title: user.name,
+				posts: posts,
+				user: req.session.user,
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+				});
+			});
+		});
+	});
+
+	app.get('/u/:name/:day/:title',function(req, res){
+		Post.getOne(req.params.name, req.params.day, req.params.title, function(err,post){
+			if(err){
+				req.flash('error',err);
+				return res.redirect('/');
+			}
+			res.render('article',{
+				title: req.params.title,
+				post: post,
+				user: req.session.user,
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+			});
+		});
+	});
+
+	app.post('/u/:name/:day/:title',checkLogin);
+	app.post('/u/:name/:day/:title',function(req,res){
+		var date = new Date(),
+			website = "/u/" + req.session.user.name,
+			time = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " 
+			     + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) ;
+
+		var comment = {
+			name: req.session.user.name,
+			time: time,
+			email: req.session.user.email,
+			website: website,
+			content: req.body.content
+		};
+		var newComment = new Comment(req.params.name, req.params.day, req.params.title, comment);
+		newComment.save(function(err){
+			if(err){
+				req.flash('error',err);
+				return res.redirect('back');
+			}
+			req.flash('success','Reply success.');
+			res.redirect('back');
+		});
+	});
+
+	app.get('/edit/:name/:day/:title',checkLogin);
+	app.get('/edit/:name/:day/:title',function(req, res){
+		var currentUser = req.session.user;
+		Post.edit(currentUser.name, req.params.day, req.params.title, function(err,post){
+			if(err){
+				req.flash('error',err);
+				return res.redirect('back');
+			}
+			res.render('edit',{
+				title: 'edit',
+				post: post,
+				user: req.session.user,
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+			});
+		});
+	});
+
+	app.post('/edit/:name/:day/:title',checkLogin);
+	app.post('/edit/:name/:day/:title',function(req, res){
+		var currentUser = req.session.user;
+		Post.update(currentUser.name, req.params.day, req.params.title, req.body.post, function(err){
+			var url = '/u/' + req.params.name + '/' + req.params.day + '/' + req.params.title;
+			if(err){
+				req.flash('error',err);
+				return res.redirect(url);
+			}
+			req.flash('success','success update.');
+			res.redirect(url);
+		});
+	});
+
+	app.get('/remove/:name/:day/:title',checkLogin);
+	app.get('/remove/:name/:day/:title',function(req, res){
+		var currentUser = req.session.user;
+		Post.remove(currentUser.name, req.params.day, req.params.title, function(err){
+			if(err){
+				req.flash('error',err);
+				return res.redirect('back');
+			}
+			req.flash('success','delete this post succeed.');
+			res.redirect('/');
+		});
 	});
 
 	//权限检查并控制

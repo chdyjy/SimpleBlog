@@ -6,3 +6,6 @@ nav{position: fixed;left: 12em;font-size: 1.1em;text-transform: uppercase;width:
 nav a{display: block;text-decoration: none;padding: .7em 1em;color: #000000;}
 nav a:hover{background-color: #000000;color: #f9f9f9;-webkit-transition:color .2s linear;}
 article{font-size: 16px;padding-top: .5em;}
+
+.edit{margin: 3px;padding: 2px 5px;border-radius: 3px;background-color: #f3f3f3;color: #333;font-size: 13px;}
+.edit:hover{text-decoration: none;background-color: #000;color: #fff;-webkit-transition:color .2s linear;};
