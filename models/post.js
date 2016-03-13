@@ -1,5 +1,6 @@
 var mongodb = require('./db'),
-	markdown = require('markdown').markdown;
+	markdown = require('markdown').markdown,
+	PAGE_LIMIT = require('../settings').PAGE_LIMIT;
 
 //debug
 var util = require('util');
@@ -54,7 +55,7 @@ Post.prototype.save = function(callback){
 	});
 };
 
-Post.getAll = function(name,callback){
+Post.getAll = function(name, page, callback){
 	mongodb.open(function(err,db){
 		if(err){
 			return callback(err);
@@ -68,21 +69,28 @@ Post.getAll = function(name,callback){
 			if(name){
 				query.name = name; 
 			}
-			collection.find(query).sort({time:-1}).toArray(function(err,docs){
-				mongodb.close();
-				if(err){
-					return callback(err);
-				}
-				/*
-				* 调试时使用
-				* var result = util.inspect(docs);
-				* console.log(result);
-				* debugger;
-				*/
-				docs.forEach(function(doc){
-					doc.post = markdown.toHTML(doc.post);
+			collection.count(query, function(err,total){
+				collection.find(query,{
+					skip: (page - 1) * PAGE_LIMIT,
+					limit: PAGE_LIMIT
+				}).sort({
+					time:-1
+				}).toArray(function(err,docs){
+					mongodb.close();
+					if(err){
+						return callback(err);
+					}
+					/*
+					* 调试时使用
+					* var result = util.inspect(docs);
+					* console.log(result);
+					* debugger;
+					*/
+					docs.forEach(function(doc){
+						doc.post = markdown.toHTML(doc.post);
+					});
+					callback(null,docs,total);
 				});
-				callback(null,docs);
 			});
 		});
 	});

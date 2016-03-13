@@ -5,16 +5,22 @@
 var crypto = require('crypto'),
 	Post = require('../models/post.js'),
 	User = require('../models/user.js'),
-	Comment = require('../models/comment.js');
+	Comment = require('../models/comment.js'),
+	PAGE_LIMIT = require('../settings').PAGE_LIMIT;
 
 module.exports = function (app){
 	app.get('/',function(req,res){
-		Post.getAll(null,function(err,posts){
+		var page = req.query.p ? parseInt(req.query.p) : 1;
+
+		Post.getAll(null, page,function(err,posts,total){
 			if(err){
 				posts = [];
 			}
 			res.render('index',{
 				title:'Index',
+				page: page,
+				isFirstPage: (page - 1) == 0,
+				isLastPage: (page - 1) * PAGE_LIMIT + posts.length == total,
 				user: req.session.user,
 				posts: posts,
 				success: req.flash('success').toString(),
@@ -132,18 +138,26 @@ module.exports = function (app){
 	});
 
 	app.get('/u/:name',function(req,res){
+		var page = req.query.p ? parseInt(req.query.p) : 1;
 		User.get(req.params.name,function(err,user){
 			if(!user){
 				req.flash('error','user not exists.');
 				return res.redirect('/');
 			}
-			Post.getAll(user.name,function(err,posts){
+			Post.getAll(user.name, page, function(err,posts,total){
+				if(err){
+					req.flash('error',err);
+					return res.redirect('/');
+				}
 				res.render('user',{
-				title: user.name,
-				posts: posts,
-				user: req.session.user,
-				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
+					title: user.name,
+					posts: posts,
+					page: page,
+					isFirstPage: (page - 1) == 0,
+					isLastPage: (page - 1) * PAGE_LIMIT + posts.length == total,
+					user: req.session.user,
+					success: req.flash('success').toString(),
+					error: req.flash('error').toString()
 				});
 			});
 		});
