@@ -16,6 +16,9 @@ var methodOverride = require('method-override');
 
 var app = express();
 
+var passport = require('passport'),
+	GithubStrategy = require('passport-github').Strategy;
+
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
@@ -36,8 +39,17 @@ app.use(express.session({
 		url: 'mongodb://localhost/db'//上面的写法可能导致错误
 	})
 }));
+app.use(passport.initialize());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+
+passport.use(new GithubStrategy({
+	clientID: "dettac",
+	clientSecret: "123456",
+	callbackURL: "http://ohao.ren/"
+},function(accessToken, refreshToken, profile, done){
+	done(null, profile);
+}));
 
 // development only
 if ('development' == app.get('env')) {
