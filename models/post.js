@@ -1,6 +1,6 @@
-var mongodb = require('./db'),
-	markdown = require('markdown').markdown,
-	PAGE_LIMIT = require('../settings').PAGE_LIMIT;
+var mongodb = require('./db');
+var	markdown = require('markdown').markdown;
+var	PAGE_LIMIT = require('../settings').PAGE_LIMIT;
 
 //debug
 var util = require('util');

@@ -2,12 +2,12 @@
 /*
  * simple blog with express & mongoDB
  */
-var crypto = require('crypto'),
-	Post = require('../models/post.js'),
-	User = require('../models/user.js'),
-	Comment = require('../models/comment.js'),
-	PAGE_LIMIT = require('../settings').PAGE_LIMIT,
-	passport = require('passport');
+var crypto = require('crypto');
+var	Post = require('../models/post.js');
+var	User = require('../models/user.js');
+var	Comment = require('../models/comment.js');
+var	PAGE_LIMIT = require('../settings').PAGE_LIMIT;
+var	passport = require('passport');
 
 module.exports = function (app){
 	app.get('/',function(req,res){

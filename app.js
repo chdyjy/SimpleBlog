@@ -16,8 +16,8 @@ var methodOverride = require('method-override');
 
 var app = express();
 
-var passport = require('passport'),
-	GithubStrategy = require('passport-github').Strategy;
+var passport = require('passport');
+var	GithubStrategy = require('passport-github').Strategy;
 
 // all environments
 app.set('port', process.env.PORT || 3000);
